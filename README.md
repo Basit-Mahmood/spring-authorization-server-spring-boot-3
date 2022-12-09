@@ -32,10 +32,10 @@ This project is just for demonstration purpose to add custom grant type.
 
 All projects should be imported in eclipse fine.
 
-By default SpringAuthorizationServer will run on port 9000 with context path /springauthserver
-SpringResourceServer will run on port 8090 with context path /springresourceserver
-SpringOAuthClient will run on port 8080 with context path /springauthserverclient
-The database scripts for SpringAuthorizationServer are present in database/scripts folder. The database settings are defined in database.proeprties.
+1) By default SpringAuthorizationServer will run on port 9000 with context path /springauthserver
+2) SpringResourceServer will run on port 8090 with context path /springresourceserver
+3) SpringOAuthClient will run on port 8080 with context path /springauthserverclient
+4) The database scripts for SpringAuthorizationServer are present in database/scripts folder. The database settings are defined in database.proeprties.
 
 The Urls are also configure in application.proeprties file
 
