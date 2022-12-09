@@ -39,7 +39,7 @@ The database scripts for SpringAuthorizationServer are present in database/scrip
 
 The Urls are also configure in application.proeprties file
 
-After running all three projects. Open the url http://127.0.0.1:8080/springauthserverclient (This can be change if you change the properties file)
-Already a user1 with password field is populated. Login with the user.
-There will be three grant types. Client Credentials, Authorization Code and Password.
-Click on password grant type and the result will come.
+1) After running all three projects. Open the url http://127.0.0.1:8080/springauthserverclient (This can be change if you change the properties file)
+2) Already a user1 with password field is populated. Login with the user.
+3) There will be three grant types. Client Credentials, Authorization Code and Password.
+4) Click on password grant type and the result will come.
