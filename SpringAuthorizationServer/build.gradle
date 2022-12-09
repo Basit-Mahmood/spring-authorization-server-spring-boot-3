@@ -1,0 +1,63 @@
+plugins {
+	id 'java'
+	id 'war'
+	id 'org.springframework.boot' version '3.0.0'
+	id 'io.spring.dependency-management' version '1.1.0'
+}
+
+group = 'pk.training.basit.authorizationserver'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+    webjarsGroupId = "org.webjars"
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.security:spring-security-oauth2-authorization-server:1.0.0'
+	
+	/**
+	 * If the following dependency not get resolved then download it maually from maven. Make a folder like in my case I 
+	 * created a folder Unresolved-Jars. Put the downloaded jar in it. Comment out this dependency and uncommnet the next 
+	 * externall use dependency.
+	 */
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+	
+	/**
+	 * The thymeleaf-extras-springsecurity6-3.1.0.RELEASE.jar is not resolving that's why I am adding it externally. The above
+	 * commenting line
+	 *
+	 *    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+	 *
+	 * is added by spring but it is not downloading the dependency jar. Only POM is downloading in local gradle cache.
+	 * To resolve the error I added this line. Once dependency is downloaded using the 
+	 *
+	 * 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+	 *
+	 * No need of this external dependency
+	 */
+	//implementation files('Unresolved-Jars/thymeleaf-extras-springsecurity6-3.1.0.RELEASE')
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+	implementation group: webjarsGroupId, name: 'webjars-locator', version: '0.46'
+	implementation group: webjarsGroupId, name: 'bootstrap', version: '5.2.3'
+	implementation group: webjarsGroupId, name: 'jquery', version: '3.6.1'
+	runtimeOnly 'com.h2database:h2'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
