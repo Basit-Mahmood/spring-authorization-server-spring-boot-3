@@ -52,11 +52,6 @@ public class SecurityConfiguration {
              .eraseCredentials(true);
 	}
 	
-	//@Bean
-	//public WebSecurityCustomizer webSecurityCustomizer() {
-	//	return (web) -> web.ignoring().requestMatchers("/webjars/**", "/image/**");
-	//}
-	
 	@Bean
 	public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 		LOGGER.debug("in configure HttpSecurity");

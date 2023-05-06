@@ -23,11 +23,6 @@ public class SecurityConfig {
 	    auth.eraseCredentials(false);
 	}
 	
-	//@Bean
-	//WebSecurityCustomizer webSecurityCustomizer() {
-	//	return (web) -> web.ignoring().requestMatchers("/webjars/**");
-	///}
-	
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/webjars/**").permitAll()
@@ -37,8 +32,6 @@ public class SecurityConfig {
 		
 		return http.build();
 	}
-	
-	
 	
 	@Bean
 	UserDetailsService users() {

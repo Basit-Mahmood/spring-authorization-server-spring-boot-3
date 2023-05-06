@@ -1,7 +1,7 @@
 plugins {
 	id 'java'
 	id 'war'
-	id 'org.springframework.boot' version '3.0.0'
+	id 'org.springframework.boot' version '3.0.6'
 	id 'io.spring.dependency-management' version '1.1.0'
 }
 
@@ -19,31 +19,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-	
-	/**
-	 * If the following dependency not get resolved then download it maually from maven. Make a folder like in my case I 
-	 * created a folder Unresolved-Jars. Put the downloaded jar in it. Comment out this dependency and uncommnet the next 
-	 * externall use dependency.
-	 */
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-	
-	/**
-	 * The thymeleaf-extras-springsecurity6-3.1.0.RELEASE.jar is not resolving that's why I am adding it externally. The above
-	 * commenting line
-	 *
-	 *    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-	 *
-	 * is added by spring but it is not downloading the dependency jar. Only POM is downloading in local gradle cache.
-	 * To resolve the error I added this line. Once dependency is downloaded using the 
-	 *
-	 * 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-	 *
-	 * No need of this external dependency
-	 */
-	//implementation files('Unresolved-Jars/thymeleaf-extras-springsecurity6-3.1.0.RELEASE')
 	implementation group: 'org.webjars', name: 'webjars-locator', version: '0.46'
 	implementation group: 'org.webjars', name: 'bootstrap', version: '5.2.3'
-	implementation group: 'org.webjars', name: 'jquery', version: '3.6.1'
+	implementation group: 'org.webjars', name: 'jquery', version: '3.6.4'
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
