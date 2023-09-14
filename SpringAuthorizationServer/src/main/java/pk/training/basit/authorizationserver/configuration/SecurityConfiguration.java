@@ -1,10 +1,10 @@
 package pk.training.basit.authorizationserver.configuration;
 
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.AdviceMode;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +13,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 import pk.training.basit.authorizationserver.configuration.federated.identity.FederatedIdentityConfigurer;
 import pk.training.basit.authorizationserver.configuration.federated.identity.UserRepositoryOAuth2UserHandler;
@@ -46,26 +48,53 @@ public class SecurityConfiguration {
 	protected void configureGlobal(AuthenticationManagerBuilder builder) throws Exception {
 		LOGGER.debug("in configureGlobal");
 		 builder
-             .userDetailsService(this.userPrincipalService)
-                // .passwordEncoder(passwordEncoder())
-         .and()
-             .eraseCredentials(true);
+		 	.eraseCredentials(true)
+            .userDetailsService(this.userPrincipalService);
 	}
 	
 	@Bean
-	public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+	MvcRequestMatcher.Builder mvc(HandlerMappingIntrospector introspector) {
+		return new MvcRequestMatcher.Builder(introspector);
+	}
+	
+	@Bean
+	public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
 		LOGGER.debug("in configure HttpSecurity");
 		
 		FederatedIdentityConfigurer federatedIdentityConfigurer = new FederatedIdentityConfigurer().oauth2UserHandler(new UserRepositoryOAuth2UserHandler());
 		
-		http.authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers(EndpointRequest.toAnyEndpoint(),PathRequest.toH2Console()).permitAll()
-			.requestMatchers("/webjars/**", "/image/**").permitAll()
+		/**
+		 * To enable access to the H2 database console under Spring Security you need to change three things:
+		 * 
+		 * 		Allow all access to the url path /h2-console/*.
+		 * 		Disable CRSF (Cross-Site Request Forgery). By default, Spring Security will protect against CRSF attacks.
+		 * 		Since the H2 database console runs inside a frame, you need to enable this in in Spring Security.
+		 * 
+		 * The following Spring Security Configuration will:
+		 * 
+		 * 		Allow all requests to the root url ("/")
+		 * 		Allow all requests to the H2 database console url ("/h2-console/*")
+		 * 		Disable CSRF protection
+		 * 		Disable X-Frame-Options in Spring Security
+		 */
+		http.authorizeHttpRequests(authorizeRequests -> authorizeRequests
+			.requestMatchers(antMatcher("/")).permitAll()
+			.requestMatchers(antMatcher("/h2-console/**")).permitAll()
+			.requestMatchers(mvc.pattern("/webjars/**")).permitAll()
+			.requestMatchers(mvc.pattern("/image/**")).permitAll()
 		    .anyRequest().authenticated()
 		)
-		.formLogin(form -> form.loginPage("/login").failureUrl("/login-error").permitAll())
-		.csrf().ignoringRequestMatchers(PathRequest.toH2Console())
-		.and().headers().frameOptions().sameOrigin()
-		.and()
+		.formLogin(form -> form
+				.loginPage("/login")
+				.failureUrl("/login-error")
+				.permitAll()
+		)
+		.csrf(csrf -> csrf
+		    .ignoringRequestMatchers(antMatcher("/h2-console/**"))
+         )
+		.headers(headers -> headers
+			.frameOptions(options -> options.sameOrigin())
+		)
 		.apply(federatedIdentityConfigurer);
 		
 		return http.build();

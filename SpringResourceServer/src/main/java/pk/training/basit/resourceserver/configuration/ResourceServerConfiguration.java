@@ -39,13 +39,13 @@ public class ResourceServerConfiguration {
 	
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.securityMatcher("/messages/**").authorizeHttpRequests()
-		    .anyRequest().authenticated()
-		            //.mvcMatchers("/messages/**").access("hasAuthority('USER')")
-			        .and()
-			.oauth2ResourceServer(oauth2 -> oauth2
-			    .jwt(jwt -> jwt.decoder(jwtDecoder()).jwtAuthenticationConverter(jwtAuthenticationConverter()))
-			);
+		http.securityMatcher("/messages/**")
+		.authorizeHttpRequests(authorizeRequests -> authorizeRequests
+	        .anyRequest().authenticated()
+		)
+		.oauth2ResourceServer(oauth2 -> oauth2
+	        .jwt(jwt -> jwt.decoder(jwtDecoder()).jwtAuthenticationConverter(jwtAuthenticationConverter()))
+		);
 		
 		return http.build();
 	}

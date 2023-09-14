@@ -85,18 +85,22 @@ public class AuthorizationServerConfiguration {
 				new OAuth2ResourceOwnerPasswordAuthenticationConverter()))
 		)));
 		
-		authorizationServerConfigurer.authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint.consentPage(CUSTOM_CONSENT_PAGE_URI));
+		authorizationServerConfigurer.authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint.
+				consentPage(CUSTOM_CONSENT_PAGE_URI)
+		);
 		
 		RequestMatcher endpointsMatcher = authorizationServerConfigurer.getEndpointsMatcher();
 		
 		
 		http
 			.securityMatcher(endpointsMatcher)
-			.authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
+			.authorizeHttpRequests(authorizeRequests -> authorizeRequests
+					.anyRequest().authenticated()
+			)
 			.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
-			.apply(authorizationServerConfigurer)
-			.and()
-			.apply(new FederatedIdentityConfigurer());
+			.apply(authorizationServerConfigurer);
+		
+		http.apply(new FederatedIdentityConfigurer());
 		
 		SecurityFilterChain securityFilterChain = http.formLogin(Customizer.withDefaults()).build();
 		

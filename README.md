@@ -8,7 +8,7 @@ These are the same projects as of repository spring-authorization-server-passwor
 
 1) It is using JPA instead of JDBC
 2) All projects are now using Spring Boot 3 with base Java version 17
-3) For Spring Boot 3 it is using Authorization server version 1.0.2
+3) For Spring Boot 3 it is now using Spring Boot Starter for Spring Authorization server
 4) Instead of creating the Oauth2 authorization server client in code. Now a database script is using. From the database it loads the clients and then
    clients converted to Registered Clients.
 5) Instead of one application.properties file. Properties files are now split. The split properties files are now importing in application.properties file

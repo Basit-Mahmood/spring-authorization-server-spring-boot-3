@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -25,24 +24,29 @@ public class SecurityConfig {
 	
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/webjars/**").permitAll()
-				.anyRequest().authenticated())
-			.formLogin(form -> form.loginPage("/login").failureUrl("/login-error").permitAll())
-			.oauth2Client(withDefaults());
+		http.authorizeHttpRequests(authorizeRequests -> authorizeRequests.
+			requestMatchers("/webjars/**").permitAll()
+			.anyRequest().authenticated()
+		)
+		.formLogin(form -> form
+			.loginPage("/login")
+			.failureUrl("/login-error")
+			.permitAll()
+		)
+		.oauth2Client(withDefaults());
 		
 		return http.build();
 	}
 	
 	@Bean
-	UserDetailsService users() {
-		
+    public InMemoryUserDetailsManager userDetailsService() {
 		UserDetails user = User.withDefaultPasswordEncoder()
 				.username("user1")
 				.password("password")
 				.authorities("USER")
 				.build();
-		
-		return new InMemoryUserDetailsManager(user);
-	}
+        
+        return new InMemoryUserDetailsManager(user);
+    }
 	
 }
