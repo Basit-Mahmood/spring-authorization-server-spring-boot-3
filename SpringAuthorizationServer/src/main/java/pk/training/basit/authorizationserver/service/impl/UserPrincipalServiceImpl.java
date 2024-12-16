@@ -3,7 +3,7 @@ package pk.training.basit.authorizationserver.service.impl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import pk.training.basit.authorizationserver.jpa.entity.UserPrincipal;
+import pk.training.basit.authorizationserver.jpa.entity.User;
 import pk.training.basit.authorizationserver.jpa.repository.UserPrincipalRepository;
 import pk.training.basit.authorizationserver.service.UserPrincipalService;
 
@@ -58,9 +58,9 @@ public class UserPrincipalServiceImpl implements UserPrincipalService {
    	 */
     @Override
     @Transactional
-    public UserPrincipal loadUserByUsername(String username) {
+    public User loadUserByUsername(String username) {
         
-    	UserPrincipal principal = userPrincipalRepository.getByUsername(username);
+    	User principal = userPrincipalRepository.getByUsername(username);
        
     	// make sure the authorities and password are loaded
         principal.getAuthorities().size();

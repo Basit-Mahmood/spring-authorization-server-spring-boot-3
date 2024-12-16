@@ -2,7 +2,7 @@ package pk.training.basit.authorizationserver.jpa.repository;
 
 import org.springframework.data.repository.CrudRepository;
 
-import pk.training.basit.authorizationserver.jpa.entity.UserPrincipal;
+import pk.training.basit.authorizationserver.jpa.entity.User;
 
 /**
  * Spring Data, a Spring project separate from but dependent on Spring Framework, can write your repositories for you. All you have 
@@ -66,7 +66,7 @@ import pk.training.basit.authorizationserver.jpa.entity.UserPrincipal;
  * @author basit.ahmed
  *
  */
-public interface UserPrincipalRepository extends CrudRepository<UserPrincipal, Long> {
+public interface UserPrincipalRepository extends CrudRepository<User, Long> {
     
 	/**
 	 * Query methods are specially defined methods that tell Spring Data how to find entities. The name of a query method starts with
@@ -183,5 +183,5 @@ public interface UserPrincipalRepository extends CrudRepository<UserPrincipal, L
 		   Pattern) specified in the corresponding method parameter.
 	 * 
 	 */
-	UserPrincipal getByUsername(String username);
+	User getByUsername(String username);
 }

@@ -10,9 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.MappedSuperclass;
 
-@MappedSuperclass
 @Embeddable
 @AccessType(AccessType.Type.FIELD)
 public class Audit {

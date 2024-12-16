@@ -1,5 +1,10 @@
+create sequence if not exists user_seq
+start with 1
+increment by 1
+no cache;
+
 create table UserPrincipal (
-  	UserId BIGINT auto_increment not null PRIMARY KEY,
+  	Id bigint default (next VALUE for user_seq) primary key,
   	Username varchar2(36) not null,
   	HashedPassword nvarchar2(128) NOT null,
   	AccountNonExpired boolean not null,
@@ -14,11 +19,10 @@ create table UserPrincipal (
   	constraint UC_UserPrincipal_Username unique (Username)
 );
 
-create table UserPrincipalAuthority (
+create table UserAuthority (
   	UserId BIGINT not null,
   	Authority varchar2(100) not null,
-  	constraint UC_UserPrincipalAuthority_User_Authority unique (UserId, Authority),
-  	constraint FK_UserPrincipalAuthority_UserId foreign key (UserId) 
-	references UserPrincipal (UserId) on delete cascade
+  	constraint UC_UserAuthority_User_Authority unique (UserId, Authority),
+  	constraint FK_UserAuthority_UserId foreign key (UserId) references UserPrincipal (Id) on delete cascade
 );
 

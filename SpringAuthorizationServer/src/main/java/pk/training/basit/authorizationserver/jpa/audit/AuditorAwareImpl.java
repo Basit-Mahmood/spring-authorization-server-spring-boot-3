@@ -7,7 +7,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import pk.training.basit.authorizationserver.jpa.entity.UserPrincipal;
+import pk.training.basit.authorizationserver.jpa.entity.User;
 
 public class AuditorAwareImpl implements AuditorAware<Long> {
 
@@ -18,7 +18,7 @@ public class AuditorAwareImpl implements AuditorAware<Long> {
 		
 		Authentication principal = SecurityContextHolder.getContext().getAuthentication();
 		if (isPrincipalAuthenticated(principal)) {
-			UserPrincipal userPrincipal = (UserPrincipal) principal.getPrincipal();
+			User userPrincipal = (User) principal.getPrincipal();
 			userId = userPrincipal.getId();
 		}
 		

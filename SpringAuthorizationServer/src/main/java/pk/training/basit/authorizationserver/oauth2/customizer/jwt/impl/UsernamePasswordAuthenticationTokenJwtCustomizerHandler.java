@@ -13,7 +13,7 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.util.CollectionUtils;
 
-import pk.training.basit.authorizationserver.jpa.entity.UserPrincipal;
+import pk.training.basit.authorizationserver.jpa.entity.User;
 import pk.training.basit.authorizationserver.oauth2.customizer.jwt.JwtCustomizerHandler;
 
 public class UsernamePasswordAuthenticationTokenJwtCustomizerHandler extends AbstractJwtCustomizerHandler {
@@ -26,7 +26,7 @@ public class UsernamePasswordAuthenticationTokenJwtCustomizerHandler extends Abs
 	protected void customizeJwt(JwtEncodingContext jwtEncodingContext) {
 		
 		Authentication authentication = jwtEncodingContext.getPrincipal();
-		UserPrincipal userPrincipal = (UserPrincipal)authentication.getPrincipal();
+		User userPrincipal = (User)authentication.getPrincipal();
 		Long userId = userPrincipal.getId();
 		Set<String> authorities = userPrincipal.getAuthorities().stream()
 				.map(GrantedAuthority::getAuthority)

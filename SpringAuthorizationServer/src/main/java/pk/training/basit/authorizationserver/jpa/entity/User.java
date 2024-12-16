@@ -18,6 +18,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
@@ -36,6 +37,7 @@ import pk.training.basit.authorizationserver.jpa.audit.AuditDeletedDate;
  */
 @Entity
 @Table(
+	name = "UserPrincipal",
 	uniqueConstraints = {
         @UniqueConstraint(
     	    name = "UserPrincipal_Username", 
@@ -55,39 +57,17 @@ import pk.training.basit.authorizationserver.jpa.audit.AuditDeletedDate;
  * org.springframework.security.core.CredentialsContainer so that Spring Security clears the password when the authentication process
  * is complete.
  */
-public class UserPrincipal implements UserDetails, CredentialsContainer, Cloneable {
+public class User implements UserDetails, CredentialsContainer, Cloneable {
 	
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * One of the first things you must do when mapping JPA entities is create surrogate keys, also called primary keys or IDs, for 
-	 * those entities. Every entity should have an ID, which can be one field (and thus a single column) or multiple fields (and thus
-	 * multiple columns). As a result, you have many different approaches for mapping an ID.
-	 * 
-	 * First, you can mark any JavaBean property with @javax.persistence.Id. This annotation can go on the private field or the 
-	 * public accessor method and indicates that the property is the entity’s surrogate key. The property may be any Java primitive, 
-	 * primitive wrapper, String, java.util.Date, java.sql.Date, java.math.BigInteger, or java.math.BigDecimal.
-	 * 
-	 * If your entity class does not have an @Id property, the JPA provider looks for a property named id (with accessor getId and 
-	 * mutator setId) and uses it automatically. This property must also be a primitive, primitive wrapper, String, java.util.Date, 
-	 * java.sql.Date, BigInteger, or BigDecimal.
-	 * 
-	 * You can, whenever you want, create an entity with an ID that is manually generated and assigned. However, this is rarely 
-	 * desired because it requires extra, repetitive, unnecessary work. Typically, you want your entity IDs to be automatically 
-	 * generated in some manner. You can accomplish this using the @javax.persistence.GeneratedValue annotation. @GeneratedValue 
-	 * enables you to specify a generation strategy and, if necessary, a generator name. For example, the Book and Author entity IDs
-	 * use javax.persistence.GenerationType.IDENTITY to indicate that the database column the ID is stored in can generate its own 
-	 * value automatically.
-	 * 
-	 * This is compatible with MySQL AUTO_INCREMENT columns, Microsoft SQL Server and Sybase IDENTITY columns, PostgreSQL SERIAL and 
-	 * DEFAULT NEXTVAL() columns, Oracle DEFAULT SYS_GUID() columns, and more. You cannot use GenerationType.IDENTITY with databases 
-	 * that do not support the auto-generation of column values, but all the most common relational databases support this.
-	 * 
-	 * @return
-	 */
 	@Id
-	@Column(name = "UserId")
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_generator")
+    @SequenceGenerator(
+        name = "user_id_generator",
+        sequenceName = "user_seq",
+        allocationSize = 1
+    )
 	private Long id;
 	
 	@Basic
@@ -109,11 +89,11 @@ public class UserPrincipal implements UserDetails, CredentialsContainer, Cloneab
 	// @CollectionTable in UserPrincipal maps UserAuthority to the UserPrincipalAuthority table.
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
-    	name = "UserPrincipalAuthority", 
+    	name = "UserAuthority", 
     	joinColumns = {
             @JoinColumn(
             	name = "UserId", 
-            	referencedColumnName = "UserId"
+            	referencedColumnName = "Id"
             )
        }
     )
@@ -122,15 +102,15 @@ public class UserPrincipal implements UserDetails, CredentialsContainer, Cloneab
     @Embedded
     private AuditDeletedDate audit = new AuditDeletedDate();
    
-    public UserPrincipal() {
+    public User() {
 		
 	}
 
-    public UserPrincipal(Long id, String username, String password, Set<UserAuthority> authorities) {
+    public User(Long id, String username, String password, Set<UserAuthority> authorities) {
 		this(id, username, password, true, true, true, true, authorities, null);
 	}
     
-	public UserPrincipal(Long id, String username, String password, boolean enabled, boolean accountNonExpired, 
+	public User(Long id, String username, String password, boolean enabled, boolean accountNonExpired, 
 			boolean credentialsNonExpired, boolean accountNonLocked, Set<UserAuthority> authorities, AuditDeletedDate audit) {
 		this.id = id;
 		this.username = username;
@@ -238,13 +218,13 @@ public class UserPrincipal implements UserDetails, CredentialsContainer, Cloneab
 
     @Override
     public boolean equals(Object other) {
-    	return other instanceof UserPrincipal && ((UserPrincipal)other).id == this.id;
+    	return other instanceof User && ((User)other).id == this.id;
     }
 
     @Override
-    protected UserPrincipal clone() {
+    protected User clone() {
     	try {
-            return (UserPrincipal)super.clone();
+            return (User)super.clone();
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e); // not possible
         }

@@ -8,10 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AdviceMode;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
@@ -30,26 +35,39 @@ import pk.training.basit.authorizationserver.service.UserPrincipalService;
 public class SecurityConfiguration {
 
 	private static final Logger LOGGER = LogManager.getLogger(SecurityConfiguration.class);
+	private static final String H2_CONSOLE_URL = "/h2-console/**";
 
 	@Autowired 
 	private UserPrincipalService userPrincipalService;
 	
 	// If no passwordEncoder bean is defined then you have to prefix password like {noop}secret1, or {bcrypt}password
-	// if not static spring boot 2.6.x gives bean currently in creation error at line .passwordEncoder(passwordEncoder()) in configureGlobal() method
+	// if not static password encoder is define spring boot gives cyclic dependency error on UserserviceImpl bean as it is using PasswordEncoder.
+	// If you remove static from method then while saving plain password will save in database
 	/**
+	 * As we are using prefixes in our test scripts for passwords in src/main/resources/database/scripts/user-principla-test-data.sql and 
+	 * src/main/resources/database/scripts/oauth2-client-test-data.sql.
+	 * 
+	 * That's why we are not specifying specific password encoder. In user-principla-test-data.sql we are using {bcrypt} prefix. So delegating 
+	 * password encoder will automatically validate it with BCrypt password encoder.
+	 * 
+	 * Similarly in oauth2-client-test-data.sql we are using {noop}. So delegating password encoder will automatically validate it with Plain 
+	 * password encoder.
+	 * 
+	 * This is a sample project. Just for demonstration we are doing it in this way.
+	 * 
+	 */
 	@Bean
-    public static PasswordEncoder passwordEncoder() {		
-		LOGGER.debug("in passwordEncoder");
-        return new BCryptPasswordEncoder();
+    public static PasswordEncoder passwordEncoder() {
+		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     };
-    */
-	
-	@Autowired
-	protected void configureGlobal(AuthenticationManagerBuilder builder) throws Exception {
-		LOGGER.debug("in configureGlobal");
-		 builder
-		 	.eraseCredentials(true)
-            .userDetailsService(this.userPrincipalService);
+    
+	@Bean
+	public AuthenticationManager authenticationManager(PasswordEncoder passwordEncoder) {
+		DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+		daoAuthenticationProvider.setUserDetailsService(userPrincipalService);
+		daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
+
+		return new ProviderManager(daoAuthenticationProvider);
 	}
 	
 	@Bean
@@ -61,6 +79,7 @@ public class SecurityConfiguration {
 	public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
 		LOGGER.debug("in configure HttpSecurity");
 		
+		Customizer <FederatedIdentityConfigurer>  federatedIdentityConfigurerCustomizer = Customizer.withDefaults();
 		FederatedIdentityConfigurer federatedIdentityConfigurer = new FederatedIdentityConfigurer().oauth2UserHandler(new UserRepositoryOAuth2UserHandler());
 		
 		/**
@@ -79,7 +98,7 @@ public class SecurityConfiguration {
 		 */
 		http.authorizeHttpRequests(authorizeRequests -> authorizeRequests
 			.requestMatchers(antMatcher("/")).permitAll()
-			.requestMatchers(antMatcher("/h2-console/**")).permitAll()
+			.requestMatchers(antMatcher(H2_CONSOLE_URL)).permitAll()
 			.requestMatchers(mvc.pattern("/webjars/**")).permitAll()
 			.requestMatchers(mvc.pattern("/image/**")).permitAll()
 		    .anyRequest().authenticated()
@@ -90,12 +109,12 @@ public class SecurityConfiguration {
 				.permitAll()
 		)
 		.csrf(csrf -> csrf
-		    .ignoringRequestMatchers(antMatcher("/h2-console/**"))
+		    .ignoringRequestMatchers(antMatcher(H2_CONSOLE_URL))
          )
 		.headers(headers -> headers
 			.frameOptions(options -> options.sameOrigin())
 		)
-		.apply(federatedIdentityConfigurer);
+		.with(federatedIdentityConfigurer, federatedIdentityConfigurerCustomizer);
 		
 		return http.build();
 	}

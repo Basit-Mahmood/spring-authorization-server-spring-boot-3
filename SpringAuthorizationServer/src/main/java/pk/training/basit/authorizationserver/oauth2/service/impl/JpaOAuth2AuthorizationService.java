@@ -33,7 +33,7 @@ import pk.training.basit.authorizationserver.jackson2.mixin.UserAuthorityMixin;
 import pk.training.basit.authorizationserver.jackson2.mixin.UserPrincipalMixin;
 import pk.training.basit.authorizationserver.jpa.audit.AuditDeletedDate;
 import pk.training.basit.authorizationserver.jpa.entity.UserAuthority;
-import pk.training.basit.authorizationserver.jpa.entity.UserPrincipal;
+import pk.training.basit.authorizationserver.jpa.entity.User;
 import pk.training.basit.authorizationserver.oauth2.OAuth2Util;
 import pk.training.basit.authorizationserver.oauth2.entity.OAuth2AuthorizationEntity;
 import pk.training.basit.authorizationserver.oauth2.repository.OAuth2AuthorizationRepository;
@@ -59,7 +59,7 @@ public class JpaOAuth2AuthorizationService implements OAuth2AuthorizationService
 		
 		// You will need to write the Mixin for your class so Jackson can marshall it.
 		this.objectMapper.addMixIn(UserAuthority.class, UserAuthorityMixin.class);
-		this.objectMapper.addMixIn(UserPrincipal.class, UserPrincipalMixin.class);
+		this.objectMapper.addMixIn(User.class, UserPrincipalMixin.class);
 		this.objectMapper.addMixIn(AuditDeletedDate.class, AuditDeletedDateMixin.class);
 		this.objectMapper.addMixIn(Long.class, LongMixin.class);
 		

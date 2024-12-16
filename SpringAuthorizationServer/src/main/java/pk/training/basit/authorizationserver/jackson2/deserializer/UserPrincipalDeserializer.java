@@ -18,14 +18,14 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 
 import pk.training.basit.authorizationserver.jpa.audit.AuditDeletedDate;
 import pk.training.basit.authorizationserver.jpa.entity.UserAuthority;
-import pk.training.basit.authorizationserver.jpa.entity.UserPrincipal;
+import pk.training.basit.authorizationserver.jpa.entity.User;
 
-public class UserPrincipalDeserializer extends JsonDeserializer<UserPrincipal> {
+public class UserPrincipalDeserializer extends JsonDeserializer<User> {
 
 	private static final TypeReference<AuditDeletedDate> AUDIT_DELETED_DATE_OBJECT = new TypeReference<AuditDeletedDate>() {};
 	
 	@Override
-	public UserPrincipal deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+	public User deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
 		
 		ObjectMapper mapper = (ObjectMapper) jp.getCodec();
 		JsonNode jsonNode = mapper.readTree(jp);
@@ -47,7 +47,7 @@ public class UserPrincipalDeserializer extends JsonDeserializer<UserPrincipal> {
 			auditDeletedDate = mapper.readValue(auditNode.toString(), AUDIT_DELETED_DATE_OBJECT);
 		}
 		
-		UserPrincipal userPrincipal = new UserPrincipal(id, username, password, enabled, accountNonExpired, credentialsNonExpired, 
+		User userPrincipal = new User(id, username, password, enabled, accountNonExpired, credentialsNonExpired, 
 				accountNonLocked, userAuthorities, auditDeletedDate);
 		if (passwordNode.asText(null) == null) {
 			userPrincipal.eraseCredentials();
